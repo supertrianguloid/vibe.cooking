@@ -12,11 +12,11 @@ after that you can git add, commit and push
 
 # Vibe list
 
-Runing ```bin/vibe list`` will list out all the recipies by name.
+Running ```bin/vibe list``` will list out all the recipes by name.
 
-Running ```bin/vibe liat authors``` will list out the authors, along with the their recipy count.
+Running ```bin/vibe liat authors``` will list out the authors, along with their recipe count.
 
-Running ```bin/vibe list tags``` will list out all the tags, along with their recipy count.
+Running ```bin/vibe list tags``` will list out all the tags, along with their recipe count.
 
 # ToDo
 
@@ -26,7 +26,7 @@ Running ```bin/vibe list tags``` will list out all the tags, along with their re
     - ~~check required fields~~
 - ~~defult recipy maker~~
 - compiler
-- host it somewere
+- host it somewhere
 - SI pipeline
 
-Plase Wirte readable code
+Please Write readable code

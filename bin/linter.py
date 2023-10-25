@@ -69,8 +69,8 @@ Recipie_Type = Recipie(
 
         difficulty=(OPTIONAL,
                     lambda dif: (isinstance(dif, int) and 0 <= dif <= 3),
-                    'How difficulty is the recipie' +
-                    '\n'.join(['0 = Trivial', '1 = Easy', '2 = Fuckupable', '3 = Hard to pull off']),
+                    'How difficulty is the recipie\n\t' +
+                    '\n\t'.join(['0 = Trivial', '1 = Easy', '2 = Fuckupable', '3 = Hard to pull off']),
                     ),
         tags=(OPTIONAL,
               lambda tags: (isinstance(tags, list)
@@ -119,14 +119,22 @@ authors_data = [dict(
 authors = [data['name'] for data in authors_data]
 
 
-def load_recipies(print=lambda *x, **y: None,
+def load_recipies(*recipies_specific, print=lambda *x, **y: None,
                   recipies_directory=recipies_directory):
-    if not recipies_directory.exists():
+
+    if ((recipies_directory is not None)
+            and (not recipies_directory.exists())):
         raise FileNotFoundError(f'Recipies Directory "{recipies_directory}" Does not exist.')
+
+    for recipie in recipies_specific:
+        if not recipie.exists():
+            raise FileNotFoundError(f'Recipie Directory "{recipie}" Does not exist')
 
     recipies = [dict(
         file=recipe_file
-        ) for recipe_file in recipies_directory.iterdir()]
+        ) for recipe_file in [*(recipies_directory.iterdir()
+                                if recipies_directory is not None else []),
+                              *recipies_specific]]
 
     for recipie in recipies:
         print(f'Loading File:"{recipie["file"]}"')
@@ -169,6 +177,7 @@ if __name__ == '__main__':
             author_directories = Path('authors')
         case 2:
             recipies_directory = Path(sys.argv[1])
+
     data = list(process_yamls(load_recipies(
             recipies_directory=recipies_directory,
             print=print), print=print))

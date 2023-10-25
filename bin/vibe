@@ -1,0 +1,58 @@
+#!/bin/env python
+from linter import (Recipie_Type,
+                    recipies_directory,
+                    RECIPE_NAME,
+                    process_yamls,
+                    load_recipies)
+from pathlib import Path
+import sys
+
+if ('--help' in sys.argv) or ('help' in sys.argv):
+    print(''' Vibe Cooking Helper Utility
+
+for a new recipie template
+          vibe new "recipe name"
+
+to check the validity all files
+          vibe lint
+
+to check the validity of a silgle recipy
+          vibe lint path/to/recipy
+''')
+    sys.exit()
+
+print('lets vibe')
+
+match sys.argv:
+    case [str(), "new", str()]:
+        print("new vibe")
+        title = sys.argv[2]
+        content = '---'
+        asdict = Recipie_Type.__dir__()
+        for field, info in zip(Recipie_Type._fields, Recipie_Type):
+            if field in {'markdown', 'file'}:
+                continue
+            content += '\n' + field + ': ' + ('(Manditory) ' if info[0] else '')
+        content += '\n---\n Recipie Goes Hear'
+        recipie_directory = Path(recipies_directory.joinpath(title))
+        if recipie_directory.exists():
+            print('Im sorry but that recipy already exists')
+            sys.exit(1)
+        recipie_directory.mkdir()
+        recipie_file = recipie_directory.joinpath(RECIPE_NAME)
+        with open(recipie_file, 'w') as f:
+            f.write(content)
+        print('done!')
+        print(f'open "{recipie_file}" to edit and git to push recipy')
+    case [str(), "lint"]:
+        print("lint vibe")
+        from linter import process_yamls, load_recipies
+        list(process_yamls(load_recipies(print=print), print=print))
+    case [str(), "lint", str()]:
+        print('lint ' + sys.argv[2])
+        list(process_yamls(load_recipies(
+            Path(sys.argv[2]),
+            recipies_directory=None,
+            print=print), print=print))
+    case _:
+        print("unknown vibe")

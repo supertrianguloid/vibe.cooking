@@ -1,6 +1,8 @@
 ---
-title: Lentil Base
-ingredients: [lentils]
+title: "Lentil Base"
+ingredients: lentils
+image: "lentil_base.png"
+zabaduk: "for score and seven years"
 ---
 
 # Ingredients

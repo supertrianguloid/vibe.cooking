@@ -1,7 +1,9 @@
 #!/bin/env python3
 from pathlib import Path
+from copy import deepcopy
 import yaml
 from collections import namedtuple as nt
+import datetime
 
 recipies_directory = Path('recipes')
 author_directories = Path('authors')
@@ -9,7 +11,7 @@ RECIPE_NAME = "recipe.md"
 
 Recipie = nt('Recipie',
              ['file',
-              'name',
+              'title',
               'author',
               'date',
               'time',
@@ -27,16 +29,16 @@ Recipie_Type = Recipie(
               lambda file: (isinstance(file, Path) and file.exists()),
               'The file containing the recipie'),
 
-        name=(MANDATORY,
-              lambda name: isinstance(name, str),
-              'Display name of the recipie'),
+        title=(MANDATORY,
+               lambda title: isinstance(title, str),
+               'Display name of the recipie'),
 
         author=(OPTIONAL,
                 lambda author: (isinstance(author, str) and author in authors),
                 'The Author of the recipie, must be in te authors directory'),
 
         date=(OPTIONAL,
-              lambda date: isinstance(date, str),
+              lambda date: isinstance(date, datetime.datetime),
               'Date when the thing recipie was written'),
 
         time=(OPTIONAL,
@@ -57,7 +59,7 @@ Recipie_Type = Recipie(
                      'Major neciserry ingredience needed to the dish'),
 
         difficulty=(OPTIONAL,
-                    lambda dif: (isinstance(int) and 0 <= dif <= 3),
+                    lambda dif: (isinstance(dif, int) and 0 <= dif <= 3),
                     'How difficulty is the recipie' +
                     '\n'.join(['0 = Trivial', '1 = Easy', '2 = Fuckupable', '3 = Hard to pull off']),
                     ),
@@ -76,41 +78,49 @@ Recipie_Type = Recipie(
         )
 
 
-def Make_Recipie(**properties):
+def Make_Recipie(print=lambda *x, **y: None,
+                 **properties):
     fields = Recipie._fields
     args = dict()
     for field, type_info in zip(fields, Recipie_Type):
         mandatory, predicate, docstring = type_info
-        if value := properties.get(field):
-            if mandatory:
-                raise Exception(f'field "{field}" is missing in {properties["file"]}, but that field is mandatory')
-            else:
-                args[field] = None
-        else:
-            if not predicate(value):
-                raise Exception(f'Field "{field}" is invalid, its value is "{value}". Doc for Field is:\n' + docstring)
-            else:
+        if (value := properties.get(field)) is not None:
+            if predicate(value):
                 args[field] = value
+            else:
+                raise Exception(f'Field "{field}" within file "{properties.get("file")}"is invalid, its value is {value.__repr__()}. Doc for Field is:\n' + docstring)
+        else:
+            if not mandatory:
+                args[field] = None
+            else:
+                raise Exception(f'field "{field}" is missing in {properties["file"]}, but that field is mandatory')
 
-    for unknown in set(properties) - set(args):
-        print(f'Warnning: Field "{unknown}" with value "{properties[unknown]}" is unknown, data is disgarded.')
+    for unknown in (set(properties)
+                    - {"yaml_string", "markdown_string"}
+                    .union(set(args))):
+        print(f'Warnning: Field "{unknown}" in "{properties["file"]}" with value "{properties[unknown]}" is unknown, data is disgarded.')
     return Recipie(**args)
 
 
-authors = [dict(
+authors_data = [dict(
     name=author_file.name,
     file=author_file
     ) for author_file in author_directories.iterdir()]
 
-recipies = [dict(
-    id=recipe_file.name,
-    file=recipe_file
-    ) for recipe_file in recipies_directory.iterdir()]
+authors = [data['name'] for data in authors_data]
 
 
-def load_recipies(print=lambda *x, **y: None):
+def load_recipies(print=lambda *x, **y: None,
+                  recipies_directory=recipies_directory):
+    if not recipies_directory.exists():
+        raise FileNotFoundError(f'Recipies Directory "{recipies_directory}" Does not exist.')
+
+    recipies = [dict(
+        file=recipe_file
+        ) for recipe_file in recipies_directory.iterdir()]
+
     for recipie in recipies:
-        print(f'Loading File:"{recipie["id"]}"')
+        print(f'Loading File:"{recipie["file"]}"')
         recipie_path = recipie['file'].joinpath(RECIPE_NAME)
         if not recipie_path.exists():
             raise Exception(f"{recipie_path} not found")
@@ -125,21 +135,29 @@ def load_recipies(print=lambda *x, **y: None):
 
         yield recipie | dict(
                 yaml_string=yaml_string,
-                markdown_string='---\n'.join(markdown),
+                markdown='---\n'.join(markdown),
+                file=recipie_path,
                 )
 
 
-def process_yamls(recipies):
+def process_yamls(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
-        yield recipie | yaml.safe_load(recipie['yaml_string'])
+        yield Make_Recipie( print=print,
+                **(recipie | yaml.safe_load(recipie['yaml_string'])))
 
 
 def clean_data(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
-        if recipie.get('yaml_string'):
-            print('removing yaml_string')
             recipie = deepcopy(recipie)
 
 
 if __name__ == '__main__':
-    data = list(process_yamls(load_recipies(print=print)))
+    import sys
+    match len(sys.argv):
+        case 1:
+            author_directories = Path('authors')
+        case 2:
+            recipies_directory = Path(sys.argv[1])
+    data = list(process_yamls(load_recipies(
+            recipies_directory=recipies_directory,
+            print=print), print=print))

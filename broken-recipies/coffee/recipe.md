@@ -1,6 +1,5 @@
----
 title: coffee
-ingredients: ['coffee ground', 'water']
+ingrediencts: ['coffee ground', 'water']
 equptment: ['V60', 'scail', 'ketel', 'timer']
 time: 5 
 author: maxwell

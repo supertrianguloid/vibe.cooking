@@ -1,4 +1,4 @@
-# Run
+# For Template
 
 ``` bin/vibe new "my new recipe" ```
 
@@ -17,6 +17,11 @@ Running ```bin/vibe list``` will list out all the recipes by name.
 Running ```bin/vibe liat authors``` will list out the authors, along with their recipe count.
 
 Running ```bin/vibe list tags``` will list out all the tags, along with their recipe count.
+
+
+# To Build Site
+
+Run bin/build
 
 # ToDo
 

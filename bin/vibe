@@ -7,8 +7,7 @@ from linter import (Recipie_Type,
 from pathlib import Path
 import sys
 
-if ('--help' in sys.argv) or ('help' in sys.argv):
-    print(''' Vibe Cooking Helper Utility
+help_string = ''' Vibe Cooking Helper Utility
 
 for a new recipie template
           vibe new "recipe name"
@@ -18,7 +17,10 @@ to check the validity all files
 
 to check the validity of a silgle recipy
           vibe lint path/to/recipy
-''')
+'''
+
+if ('--help' in sys.argv) or ('help' in sys.argv):
+    print(help_string)
     sys.exit()
 
 print('lets vibe')
@@ -55,4 +57,6 @@ match sys.argv:
             recipies_directory=None,
             print=print), print=print))
     case _:
-        print("unknown vibe")
+        print("[UNKNOWN VIBE]")
+        print(help_string)
+

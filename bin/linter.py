@@ -159,7 +159,7 @@ def load_recipies(*recipies_specific, print=lambda *x, **y: None,
 
 def process_yamls(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
-        yield Make_Recipie( print=print,
+        yield Make_Recipie(print=print,
                 **(recipie | yaml.safe_load(recipie['yaml_string'])))
 
 
@@ -168,7 +168,19 @@ def clean_data(recipies, print=lambda *x, **y: None):
             recipie = deepcopy(recipie)
 
 
-recipies = lambda : process_yamls(load_recipies())
+recipies = lambda: process_yamls(load_recipies())
+
+
+def tags(recipies):
+    tags = dict()
+    for recipie in recipies:
+        if recipie.tags is not None:
+            for tag in recipie.tags:
+                if tag not in tags:
+                    tags[tag] = []
+                tags[tag].append(recipie)
+    return tags
+
 
 if __name__ == '__main__':
     import sys

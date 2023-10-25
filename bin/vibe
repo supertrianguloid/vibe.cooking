@@ -1,4 +1,5 @@
 #!/bin/env python
+import linter
 from linter import (Recipie_Type,
                     recipies_directory,
                     RECIPE_NAME,
@@ -9,21 +10,29 @@ import sys
 
 help_string = ''' Vibe Cooking Helper Utility
 
-for a new recipie template
+for a new recipie template:
           vibe new "recipe name"
 
-to check the validity all files
+to check the validity all files:
           vibe lint
 
-to check the validity of a silgle recipy
+to check the validity of a silgle recipy:
           vibe lint path/to/recipy
+
+to list out all recipies, along with dates and users if information avalible:
+        vibe list
+
+to list out all authors, along  with the number of recipies they have writen, type:
+        vibe list authors
+
+to list out all tags, along with the number of recipies with this tag
+    vibe list tags
+
 '''
 
 if ('--help' in sys.argv) or ('help' in sys.argv):
     print(help_string)
     sys.exit()
-
-print('lets vibe')
 
 match sys.argv:
     case [str(), "new", str()]:
@@ -56,7 +65,36 @@ match sys.argv:
             Path(sys.argv[2]),
             recipies_directory=None,
             print=print), print=print))
+    case [str(), 'list'] | [str(), 'list', 'recipies']:
+        print('list vibe recipies')
+        for n, recipie in enumerate(linter.recipies()):
+            print(
+                str(n).rjust(3) + ':  ' + recipie.title
+                + (f' [by {recipie.author}] ' if recipie.author is not None else '')
+                + (f'{recipie.date}' if recipie.date is not None else ' ')
+                )
+
+    case [str(), 'list', 'authors']:
+        print('list vibe authors')
+        data = linter.recipies()
+        count = {None: 0} | {author: 0 for author in linter.authors}
+        name_lengths = max([len(author) for author in linter.authors])
+        for d in data:
+            count[d.author] += 1
+        for n, author in enumerate(linter.authors):
+            print(str(n).rjust(3) + ':  '
+                  + author.rjust(name_lengths)
+                  + f' ({count[author]})')
+
+    case [str(), 'list', 'tags']:
+        print('list vibe tags')
+        tags = [(len(recipies), tag)
+                for tag, recipies
+                in linter.tags(linter.recipies()).items()]
+        tag_length = max([len(tag[1]) for tag in tags])
+        for count, tag in sorted(tags):
+            print(tag.rjust(tag_length) + f' [{count}]')
+
     case _:
         print("[UNKNOWN VIBE]")
         print(help_string)
-

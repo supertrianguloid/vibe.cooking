@@ -6,7 +6,8 @@ include meta data
 
 ``` bin/vibe new "my new recipe" ```
 for a template, edit it, and then run
-``` bin/vibe lint ``` to check its okay.
+``` bin/vibe lint ```
+to check its okay.
 
 after that you can git add, commit and push
 

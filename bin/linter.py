@@ -5,6 +5,15 @@ import yaml
 from collections import namedtuple as nt
 import datetime
 
+# To load the data, import linter.recipies, and linter.authors_data
+# from linter import recipies
+# for r in recipies():
+#     print(r.title)
+#     print(r.author)
+#     print(r.ingredients)
+#     print(30*'-')
+
+
 recipies_directory = Path('recipes')
 author_directories = Path('authors')
 RECIPE_NAME = "recipe.md"
@@ -39,7 +48,7 @@ Recipie_Type = Recipie(
 
         date=(OPTIONAL,
               lambda date: isinstance(date, datetime.datetime),
-              'Date when the thing recipie was written'),
+              'Date when the thing recipie was written, in a datetime.datetime legible format'),
 
         time=(OPTIONAL,
               lambda time: ((isinstance(time, int) or isinstance(time, float))
@@ -150,6 +159,8 @@ def clean_data(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
             recipie = deepcopy(recipie)
 
+
+recipies = lambda : process_yamls(load_recipies())
 
 if __name__ == '__main__':
     import sys

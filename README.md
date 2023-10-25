@@ -8,7 +8,7 @@ include meta data
     - ~~check tags~~
     - ~~check author~~
     - ~~check required fields~~
-- defult recipy maker
+- ~~defult recipy maker~~
 - compiler
 - host it somewere
 - SI pipeline

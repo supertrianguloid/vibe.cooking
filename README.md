@@ -25,7 +25,7 @@ Running ```bin/vibe list tags``` will list out all the tags, along with their re
     - ~~check author~~
     - ~~check required fields~~
 - ~~defult recipy maker~~
-- compiler
+- ~~~compiler~~~ __(very basic)__
 - host it somewhere
 - SI pipeline
 

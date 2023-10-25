@@ -1,6 +1,8 @@
 #!/bin/env python3
 from pathlib import Path
 from copy import deepcopy
+from functools import partial
+import markdown
 import yaml
 from collections import namedtuple as nt
 import datetime
@@ -159,16 +161,22 @@ def load_recipies(*recipies_specific, print=lambda *x, **y: None,
 
 def process_yamls(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
-        yield Make_Recipie(print=print,
-                **(recipie | yaml.safe_load(recipie['yaml_string'])))
+        yield recipie | yaml.safe_load(recipie['yaml_string'])
 
 
-def clean_data(recipies, print=lambda *x, **y: None):
+def process_markdowns(recipies, print=lambda *x, **y: None):
     for recipie in recipies:
-            recipie = deepcopy(recipie)
+        print('Processing Markdown for ' + str(recipie['file']))
+        yield recipie | dict(markdown=markdown.markdown(recipie['markdown']))
 
 
-recipies = lambda: process_yamls(load_recipies())
+def Make_Recipies(recipies, print=lambda *x, **y: None):
+    for recipie in recipies:
+        yield Make_Recipie(print=print, **recipie)
+
+
+def recipies():
+    return Make_Recipies(process_markdowns(process_yamls(load_recipies())))
 
 
 def tags(recipies):
@@ -182,6 +190,13 @@ def tags(recipies):
     return tags
 
 
+def pipe(source, *operations):
+    value = source
+    for foo in operations:
+        value = foo(value)
+    return value
+
+
 if __name__ == '__main__':
     import sys
     match len(sys.argv):
@@ -190,6 +205,9 @@ if __name__ == '__main__':
         case 2:
             recipies_directory = Path(sys.argv[1])
 
-    data = list(process_yamls(load_recipies(
-            recipies_directory=recipies_directory,
-            print=print), print=print))
+    data = pipe(load_recipies(recipies_directory=recipies_directory,
+                              print=print),
+                process_yamls,
+                process_markdowns,
+                Make_Recipies,
+                )

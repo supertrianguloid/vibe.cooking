@@ -4,10 +4,10 @@ include meta data
 
 # ToDo
 
-- linter
-    - check tags
-    - check author
-    - check required fields
+- -linter-
+    - -check tags-
+    - -check author-
+    - -check required fields-
 - defult recipy maker
 - compiler
 - host it somewere

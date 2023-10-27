@@ -1,4 +1,4 @@
-# Run
+# For Template
 
 ``` bin/vibe new "my new recipe" ```
 
@@ -18,6 +18,11 @@ Running ```bin/vibe liat authors``` will list out the authors, along with their 
 
 Running ```bin/vibe list tags``` will list out all the tags, along with their recipe count.
 
+
+# To Build Site
+
+Run bin/build
+
 # ToDo
 
 - ~~linter~~
@@ -25,7 +30,7 @@ Running ```bin/vibe list tags``` will list out all the tags, along with their re
     - ~~check author~~
     - ~~check required fields~~
 - ~~defult recipy maker~~
-- ~~~compiler~~~ __(very basic)__
+- ~~compiler~~ _(very basic)_
 - host it somewhere
 - SI pipeline
 
